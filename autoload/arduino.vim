@@ -38,7 +38,8 @@ function! arduino#InitializeConfig() abort
     endif
   endif
   if !exists('g:arduino_args')
-    let g:arduino_args = '--verbose-upload'
+    "let g:arduino_args = '--verbose-upload'
+    let g:arduino_args = '--verbose'
   endif
   if !exists('g:arduino_serial_cmd')
     let g:arduino_serial_cmd = 'screen {port} {baud}'
@@ -189,7 +190,7 @@ function! arduino#GetArduinoCommand(cmd) abort
   endif
   let l:build_path = arduino#GetBuildPath()
   if !empty(l:build_path)
-    let cmd = cmd . '" --build-path ' . l:build_path . '"'
+    let cmd = cmd . " --build-path " . '"' . l:build_path . '"'
   endif
   let cmd = cmd . " " . g:arduino_args . ' "' . expand('%:p') . '"'
   return cmd
@@ -291,7 +292,7 @@ function! arduino#GetProgrammers() abort
 endfunction
 
 function! arduino#RebuildMakePrg() abort
-  let &l:makeprg = arduino#GetArduinoCommand("--verify")
+  let &l:makeprg = arduino#GetArduinoCommand("compile")
 endfunction
 
 function! s:BoardOrder(b1, b2) abort
@@ -405,7 +406,7 @@ function! arduino#SetBoard(board, ...) abort
 endfunction
 
 function! arduino#Verify() abort
-  let cmd = arduino#GetArduinoCommand("--verify")
+  let cmd = arduino#GetArduinoCommand("compile")
   if g:arduino_use_slime
     call slime#send(cmd."\r")
   else
@@ -603,7 +604,7 @@ function! arduino#GetInfo() abort
   echo "Port          : " . port
   echo "Baud rate     : " . g:arduino_serial_baud
   echo "Hardware dirs : " . dirs
-  echo "Verify command: " . arduino#GetArduinoCommand("--verify")
+  echo "Verify command: " . arduino#GetArduinoCommand("compile")
 endfunction
 
 " Ctrlp extension {{{1

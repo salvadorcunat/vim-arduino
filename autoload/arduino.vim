@@ -179,17 +179,17 @@ function! arduino#GetArduinoCommand(cmd) abort
     let arduino = s:HERE . '/bin/run-headless ' . arduino
   endif
 
-  let cmd = arduino . ' ' . a:cmd . " --board " . g:arduino_board
+  let cmd = arduino . ' ' . a:cmd . " --fqbn " . g:arduino_board
   let port = arduino#GetPort()
   if !empty(port)
     let cmd = cmd . " --port " . port
   endif
   if !empty(g:arduino_programmer)
-    let cmd = cmd . " --pref programmer=" . g:arduino_programmer
+    let cmd = cmd . " --programmer " . g:arduino_programmer
   endif
   let l:build_path = arduino#GetBuildPath()
   if !empty(l:build_path)
-    let cmd = cmd . " --pref " . '"build.path=' . l:build_path . '"'
+    let cmd = cmd . '" --build-path ' . l:build_path . '"'
   endif
   let cmd = cmd . " " . g:arduino_args . ' "' . expand('%:p') . '"'
   return cmd

@@ -13,7 +13,7 @@ if has('nvim')
   let s:TERM = 'botright split | terminal! '
 elseif has('terminal')
   " In vim, doing terminal! will automatically open in a new split
-  let s:TERM = 'terminal! '
+  let s:TERM = 'vert terminal! '
 else
   " Backwards compatible with old versions of vim
   let s:TERM = '!'

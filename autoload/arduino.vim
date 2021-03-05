@@ -34,11 +34,10 @@ function! arduino#InitializeConfig() abort
     if exists('g:_cache_arduino_programmer')
       let g:arduino_programmer = g:_cache_arduino_programmer
     else
-      let g:arduino_programmer = 'arduino:usbtinyisp'
+      let g:arduino_programmer = ''
     endif
   endif
   if !exists('g:arduino_args')
-    "let g:arduino_args = '--verbose-upload'
     let g:arduino_args = '--verbose'
   endif
   if !exists('g:arduino_serial_cmd')

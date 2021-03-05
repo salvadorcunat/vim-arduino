@@ -157,7 +157,7 @@ function! arduino#GetArduinoExecutable() abort
   elseif s:OS == 'Darwin'
     return '/Applications/Arduino.app/Contents/MacOS/Arduino'
   else
-    return 'arduino'
+    return 'arduino-cli'
   endif
 endfunction
 

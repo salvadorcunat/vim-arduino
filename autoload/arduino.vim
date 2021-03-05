@@ -416,14 +416,15 @@ endfunction
 
 function! arduino#Upload() abort
   if g:arduino_upload_using_programmer
-    let cmd_options = "--upload --useprogrammer"
+    let cmd_options = " --upload " . " --programmer " . g:arduino_programmer
   else
     let cmd_options = "--upload"
   endif
-  let cmd = arduino#GetArduinoCommand(cmd_options)
+  let cmd = arduino#GetArduinoCommand("compile")
   if g:arduino_use_slime
     call slime#send(cmd."\r")
   else
+    let cmd = cmd . " " . cmd_options
     exe s:TERM . cmd
   endif
   return v:shell_error

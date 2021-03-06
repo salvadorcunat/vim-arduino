@@ -152,13 +152,16 @@ endfunction
 
 " Arduino command helpers {{{1
 function! arduino#GetArduinoExecutable() abort
-  if exists('g:arduino_cmd')
-    return g:arduino_cmd
-  elseif s:OS == 'Darwin'
-    return '/Applications/Arduino.app/Contents/MacOS/Arduino'
-  else
-    return 'arduino-cli'
+  if !exists('g:arduino_cmd')
+    let g:arduino_cmd = substitute(system('basename $(command -v arduino-cli)'), '\n', '', '')
+    if empty(g:arduino_cmd)
+      g:arduino_cmd = substitute(system('basename $(command -v arduino')), '\n', '', '')
+    endif
   endif
+  if empty(g:arduino_cmd) && s:OS == 'Darwin'
+    g:arduino_cmd = '/Applications/Arduino.app/Contents/MacOS/Arduino'
+  endif
+  return g:arduino_cmd
 endfunction
 
 function! arduino#GetBuildPath() abort

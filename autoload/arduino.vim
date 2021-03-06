@@ -182,17 +182,29 @@ function! arduino#GetArduinoCommand(cmd) abort
     let arduino = s:HERE . '/bin/run-headless ' . arduino
   endif
 
-  let cmd = arduino . ' ' . a:cmd . " --fqbn " . g:arduino_board
+  if arduino == 'arduino-cli'
+    let cmd = arduino . ' ' . a:cmd . " --fqbn " . g:arduino_board
+  else
+    let cmd = arduino . ' ' . a:cmd . " --board " . g:arduino_board
+  endif
   let port = arduino#GetPort()
   if !empty(port)
     let cmd = cmd . " --port " . port
   endif
   if !empty(g:arduino_programmer)
-    let cmd = cmd . " --programmer " . g:arduino_programmer
+    if arduino == 'arduino-cli'
+      let cmd = cmd . " --programmer " . g:arduino_programmer
+    else
+      let cmd = cmd . " --pref programmer=" . g:arduino_programmer
+    endif
   endif
   let l:build_path = arduino#GetBuildPath()
   if !empty(l:build_path)
-    let cmd = cmd . " --build-path " . '"' . l:build_path . '"'
+    if arduino == 'arduino-cli'
+      let cmd = cmd . " --build-path " . '"' . l:build_path . '"'
+    else
+      let cmd = cmd . " --pref " . '"build.path=' . l:build_path . '"'
+    endif
   endif
   let cmd = cmd . " " . g:arduino_args . ' "' . expand('%:p') . '"'
   return cmd
@@ -294,7 +306,11 @@ function! arduino#GetProgrammers() abort
 endfunction
 
 function! arduino#RebuildMakePrg() abort
-  let &l:makeprg = arduino#GetArduinoCommand("compile")
+  if g:arduino_cmd == 'arduino-cli'
+    let &l:makeprg = arduino#GetArduinoCommand("compile")
+  else
+    let &l:makeprg = arduino#GetArduinoCommand("--verify")
+  endif
 endfunction
 
 function! s:BoardOrder(b1, b2) abort
@@ -408,7 +424,11 @@ function! arduino#SetBoard(board, ...) abort
 endfunction
 
 function! arduino#Verify() abort
-  let cmd = arduino#GetArduinoCommand("compile")
+  if g:arduino_cmd == 'arduino-cli'
+    let cmd = arduino#GetArduinoCommand("compile")
+  else
+    let cmd = arduino#GetArduinoCommand("--verify")
+  endif
   if g:arduino_use_slime
     call slime#send(cmd."\r")
   else
@@ -419,11 +439,19 @@ endfunction
 
 function! arduino#Upload() abort
   if g:arduino_upload_using_programmer
-    let cmd_options = " --upload " . " --programmer " . g:arduino_programmer
+    if g:arduino_cmd == 'arduino-cli'
+      let cmd_options = " --upload " . " --programmer " . g:arduino_programmer
+    else
+      let cmd_options = "--upload --useprogrammer"
+    endif
   else
     let cmd_options = "--upload"
   endif
-  let cmd = arduino#GetArduinoCommand("compile")
+  if g:arduino_cmd == 'arduino-cli'
+    let cmd = arduino#GetArduinoCommand("compile")
+  else
+    let cmd = arduino#GetArduinoCommand(cmd_options)
+  endif
   if g:arduino_use_slime
     call slime#send(cmd."\r")
   else
@@ -607,7 +635,11 @@ function! arduino#GetInfo() abort
   echo "Port          : " . port
   echo "Baud rate     : " . g:arduino_serial_baud
   echo "Hardware dirs : " . dirs
-  echo "Verify command: " . arduino#GetArduinoCommand("compile")
+  if g:arduino_cmd == 'arduino-cli'
+    echo "Verify command: " . arduino#GetArduinoCommand("compile")
+  else
+    echo "Verify command: " . arduino#GetArduinoCommand("--verify")
+  endif
 endfunction
 
 " Ctrlp extension {{{1

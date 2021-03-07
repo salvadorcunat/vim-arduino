@@ -437,6 +437,13 @@ function! arduino#Verify() abort
   return v:shell_error
 endfunction
 
+function! arduino#VerifyV() abort
+  let l:prevTERM = s:TERM
+  let s:TERM = 'vert terminal! '
+  call arduino#Verify()
+  let s:TERM = l:prevTERM
+endfunction
+
 function! arduino#Upload() abort
   if g:arduino_upload_using_programmer
     if g:arduino_cmd == 'arduino-cli'
@@ -461,19 +468,33 @@ function! arduino#Upload() abort
   return v:shell_error
 endfunction
 
+function! arduino#UploadV() abort
+  let l:prevTERM = s:TERM
+  let s:TERM = 'vert terminal! '
+  call arduino#Upload()
+  let s:TERM = l:prevTERM
+endfunction
+
 function! arduino#Serial() abort
   let cmd = arduino#GetSerialCmd()
   if empty(cmd) | return | endif
   if g:arduino_use_slime
     call slime#send(cmd."\r")
   else
-    let s:TERM = 'terminal ++close '
+    let s:TERM = s:TERM . '++close '
     exe s:TERM . cmd
   endif
 endfunction
 
+function! arduino#SerialV() abort
+  let l:prevTERM = s:TERM
+  let s:TERM = 'vert terminal! '
+  call arduino#Serial()
+  let s:TERM = l:prevTERM
+endfunction
+
 function! arduino#UploadAndSerial() abort
-  let ret = arduino#Upload()
+  let ret = arduino#UploadV()
   echo "Press any key ..."
   let l:char = getchar()
   if ret == 0

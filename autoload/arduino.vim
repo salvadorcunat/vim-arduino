@@ -467,12 +467,15 @@ function! arduino#Serial() abort
   if g:arduino_use_slime
     call slime#send(cmd."\r")
   else
+    let s:TERM = 'terminal ++close '
     exe s:TERM . cmd
   endif
 endfunction
 
 function! arduino#UploadAndSerial() abort
   let ret = arduino#Upload()
+  echo "Press any key ..."
+  let l:char = getchar()
   if ret == 0
     call arduino#Serial()
   endif
